@@ -1,3 +1,4 @@
+import { DemoAccounts } from "@/components/layout/demo-accounts";
 import { LoginForm } from "@/components/layout/login-form";
 import { Rangoli } from "@/components/layout/rangoli";
 
@@ -18,6 +19,7 @@ export default function LoginPage() {
             Your customers, their profiles and today&apos;s matches.
           </p>
           <LoginForm />
+          <DemoAccounts />
         </div>
       </div>
     </main>
