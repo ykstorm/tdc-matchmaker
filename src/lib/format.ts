@@ -13,14 +13,6 @@ export function fullName(profile: Pick<Profile, "firstName" | "lastName">) {
   return `${profile.firstName} ${profile.lastName}`;
 }
 
-export function formatSiblings(profile: Pick<Profile, "brothers" | "sisters">) {
-  const parts = [
-    profile.brothers && `${profile.brothers} brother${profile.brothers > 1 ? "s" : ""}`,
-    profile.sisters && `${profile.sisters} sister${profile.sisters > 1 ? "s" : ""}`,
-  ].filter(Boolean);
-  return parts.length ? parts.join(", ") : "Only child";
-}
-
 export function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
 }

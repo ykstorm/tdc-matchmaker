@@ -41,9 +41,3 @@ export interface MatchList {
   passedFilters: number;
   relaxed: string[];
 }
-
-export interface IntroDraft {
-  subject: string;
-  body: string;
-  writtenBy: "ai" | "template";
-}

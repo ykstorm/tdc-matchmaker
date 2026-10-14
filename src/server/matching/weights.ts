@@ -61,7 +61,7 @@ export function weightsFor(gender: Gender): WeightTable {
 export const CUSTOMER_SIDE_WEIGHT = 0.6;
 export const CANDIDATE_SIDE_WEIGHT = 0.4;
 
-export const MATCHES_TO_SHOW = 10;
+export const MATCHES_TO_SHOW = 20;
 export const MIN_CANDIDATES = 15;
 export const AGE_WIDEN_STEP = 2;
 export const MAX_AGE_WIDENINGS = 2;

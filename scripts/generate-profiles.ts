@@ -6,7 +6,7 @@ import { existsSync, writeFileSync } from "node:fs";
 import { hashSync } from "bcryptjs";
 
 import type { CustomerRecord, CustomerStatus, Note, PartnerPreferences } from "../src/types/customer";
-import type { Profile } from "../src/types/profile";
+import type { Gender, Profile } from "../src/types/profile";
 import { buildProfile } from "./seed/build-profile";
 import { createRandom, type Random } from "./seed/random";
 
@@ -82,7 +82,7 @@ function writeJson(name: string, data: unknown) {
 
 function main() {
   const random = createRandom(SEED);
-  const genders = Array.from({ length: PER_GENDER * 2 }, (_, i) => (i % 2 === 0 ? "Male" : "Female") as const);
+  const genders = Array.from({ length: PER_GENDER * 2 }, (_, i): Gender => (i % 2 === 0 ? "Male" : "Female"));
   const pool = genders.map((gender, i) => buildProfile(random, gender, i + 1));
   const customers = pickCustomers(random, pool);
   writeJson("profiles.json", pool);
