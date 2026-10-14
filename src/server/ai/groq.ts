@@ -3,11 +3,10 @@ import OpenAI from "openai";
 import { ageFrom } from "@/lib/age";
 import type { Profile } from "@/types/profile";
 
-// Groq speaks the OpenAI API, so the official SDK works with a different base
-// URL. Free tier, no card. Groq lists this model as deprecated for
-// 16 Aug 2026 while still serving it, so GROQ_MODEL can swap it without a
-// deploy (their suggested replacement is openai/gpt-oss-20b).
-const MODEL = process.env.GROQ_MODEL ?? "llama-3.1-8b-instant";
+// Groq speaks the OpenAI API, so the official SDK works with Groq's base URL.
+// gpt-oss-20b is an open-weight model Groq serves on its free tier. No OpenAI
+// account or key is involved. GROQ_MODEL swaps it without a code change.
+const MODEL = process.env.GROQ_MODEL ?? "openai/gpt-oss-20b";
 
 let client: OpenAI | null | undefined;
 
@@ -47,13 +46,20 @@ export function profileBrief(profile: Profile) {
   };
 }
 
+// gpt-oss thinks before answering. Low effort is plenty for ranking 20
+// people, and the reasoning stays out of the reply so JSON.parse sees only
+// the answer. Groq's default cap of 1024 tokens cuts off 20 explanations.
+const REASONING = MODEL.startsWith("openai/gpt-oss") ? { reasoning_effort: "low", include_reasoning: false } : {};
+
 export async function askForJson(system: string, user: unknown) {
   const ai = groq();
   if (!ai) return null;
   const completion = await ai.chat.completions.create({
     model: MODEL,
     temperature: 0.4,
+    max_completion_tokens: 4096,
     response_format: { type: "json_object" },
+    ...(REASONING as object),
     messages: [
       { role: "system", content: system },
       { role: "user", content: JSON.stringify(user) },
