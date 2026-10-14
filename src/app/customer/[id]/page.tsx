@@ -29,13 +29,13 @@ export default async function CustomerPage({ params }: PageProps<"/customer/[id]
   return (
     <>
       <AppHeader name={session.name} />
-      <main className="mx-auto grid w-full max-w-7xl flex-1 gap-10 px-4 py-8 sm:px-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
-        <div className="grid content-start gap-8">
+      <main className="mx-auto grid w-full max-w-7xl flex-1 gap-10 px-4 py-8 sm:px-6 lg:grid-cols-5">
+        <div className="grid min-w-0 content-start gap-8 lg:col-span-3">
           <div>
             <Link href="/dashboard" className="text-muted-foreground inline-block py-1 text-sm hover:underline">All customers</Link>
             <div className="mt-3 flex flex-wrap items-center justify-between gap-4">
               <div className="flex items-center gap-3">
-                <h1 className="font-serif text-3xl leading-tight tracking-[-0.01em]">{fullName(profile)}</h1>
+                <h1 className="font-serif text-3xl leading-tight tracking-heading">{fullName(profile)}</h1>
                 {profile.verified && <Badge variant="secondary">Verified</Badge>}
               </div>
               <StatusSelect customerId={profile.id} initial={customer.status} />
@@ -44,7 +44,9 @@ export default async function CustomerPage({ params }: PageProps<"/customer/[id]
           <Biodata profile={profile} preferences={customer.preferences} />
           <NotesPanel customerId={profile.id} initial={customer.notes} />
         </div>
-        <MatchPanel matchmaker={session.name} customer={profile} sentMatchIds={customer.sentMatchIds} />
+        <div className="min-w-0 lg:col-span-2">
+          <MatchPanel matchmaker={session.name} customer={profile} sentMatchIds={customer.sentMatchIds} />
+        </div>
       </main>
     </>
   );

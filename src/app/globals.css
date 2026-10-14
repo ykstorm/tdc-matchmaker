@@ -55,6 +55,8 @@
   --color-status-matching: var(--status-matching);
   --color-status-introduced: var(--status-introduced);
   --color-status-hold: var(--status-hold);
+  --tracking-label: 0.05em;
+  --tracking-heading: -0.01em;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);

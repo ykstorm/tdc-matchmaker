@@ -11,11 +11,11 @@ export function CustomerTable({ customers }: { customers: CustomerSummary[] }) {
   const router = useRouter();
 
   return (
-    <div className="bg-card mt-6 rounded-xl border">
+    <div className="bg-card mt-6 rounded-xl border px-2">
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="pl-4">Name</TableHead>
+            <TableHead>Name</TableHead>
             <TableHead>Age</TableHead>
             <TableHead>City</TableHead>
             <TableHead>Marital status</TableHead>
@@ -26,14 +26,16 @@ export function CustomerTable({ customers }: { customers: CustomerSummary[] }) {
           {customers.map((customer) => (
             // The name is a real link for keyboard and new-tab use. The row
             // click is a mouse shortcut on top of it.
-            <TableRow key={customer.id} className="cursor-pointer" onClick={() => router.push(`/customer/${customer.id}`)}>
-              <TableCell className="py-3 pl-4 font-medium">
-                <Link href={`/customer/${customer.id}`} onClick={(event) => event.stopPropagation()} className="hover:underline">
+            <TableRow key={customer.id} clickable onClick={() => router.push(`/customer/${customer.id}`)}>
+              <TableCell>
+                <Link href={`/customer/${customer.id}`} onClick={(event) => event.stopPropagation()} className="font-medium hover:underline">
                   {customer.name}
                 </Link>
                 <span className="text-muted-foreground ml-2 text-xs">{customer.gender}</span>
               </TableCell>
-              <TableCell className="tabular-nums">{customer.age}</TableCell>
+              <TableCell>
+                <span className="tabular-nums">{customer.age}</span>
+              </TableCell>
               <TableCell>{customer.city}</TableCell>
               <TableCell>{customer.maritalStatus}</TableCell>
               <TableCell>

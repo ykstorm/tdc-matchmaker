@@ -166,6 +166,11 @@ doesn't spend the free-tier quota again.
 - **Types:** `tsc --noEmit` clean.
 - **Lint:** ESLint fails any function over cyclomatic complexity 10, any
   function over 40 lines and any file over 200 lines.
+- **Design system:** `@shadcn/lint` fails raw colors, arbitrary values like
+  `p-[13px]`, and restyling a component with `className`. Turning it on found
+  53 issues. Fixing them meant theme tokens for letter spacing, plain
+  wrappers for layout, and a real button size for inline links. The vendored
+  primitives keep upstream shadcn's exact values, so that one rule skips them.
 - **Complexity:** 256 functions. Highest is 8 (`dietFit`). Five sit between 6
   and 8. None over 10. `npm run complexity` prints the table.
 - **Tests:** 17 unit tests on the factors and the ranker: dealbreakers,

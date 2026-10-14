@@ -29,21 +29,7 @@ export function MatchCard({ match, sent, onSend }: Props) {
         </div>
         <ScoreBadge score={match.score} tier={match.tier} />
       </div>
-      <Collapsible className="mt-3">
-        <CollapsibleTrigger className="group text-primary flex items-center gap-1 py-1 text-sm font-medium hover:underline">
-          Why this match?
-          <ChevronDownIcon className="size-4 transition-[rotate] duration-150 group-data-[state=open]:rotate-180" aria-hidden="true" />
-        </CollapsibleTrigger>
-        <CollapsibleContent className="mt-3 grid gap-4">
-          <p className="max-w-prose text-sm leading-relaxed">{match.explanation}</p>
-          <p className="text-muted-foreground text-xs">
-            {match.explainedBy === "ai" ? "Note and final score by Groq, within 8 points of the rule score." : "Note from the rule-based score. AI review is off."}{" "}
-            Fit from your customer&apos;s side: <span className="tabular-nums">{match.customerSide}</span>. From {profile.firstName}&apos;s side:{" "}
-            <span className="tabular-nums">{match.candidateSide}</span>.
-          </p>
-          <FactorList factors={match.factors} />
-        </CollapsibleContent>
-      </Collapsible>
+      <WhyThisMatch match={match} />
       <div className="mt-4 flex items-center justify-end gap-3">
         {sent && <Badge variant="introduced">Sent</Badge>}
         <Button size="sm" variant={sent ? "outline" : "secondary"} onClick={() => onSend(match)}>
@@ -51,5 +37,31 @@ export function MatchCard({ match, sent, onSend }: Props) {
         </Button>
       </div>
     </li>
+  );
+}
+
+function WhyThisMatch({ match }: { match: Match }) {
+  return (
+    <Collapsible>
+      <div className="mt-3">
+        <CollapsibleTrigger asChild>
+          <Button variant="link" size="inline">
+            Why this match?
+            <ChevronDownIcon className="transition-transform duration-150 in-data-[state=open]:rotate-180" aria-hidden="true" />
+          </Button>
+        </CollapsibleTrigger>
+      </div>
+      <CollapsibleContent>
+        <div className="mt-3 grid gap-4">
+          <p className="max-w-prose text-sm leading-relaxed">{match.explanation}</p>
+          <p className="text-muted-foreground text-xs">
+            {match.explainedBy === "ai" ? "Note and final score by Groq, within 8 points of the rule score." : "Note from the rule-based score. AI review is off."}{" "}
+            Fit from your customer&apos;s side: <span className="tabular-nums">{match.customerSide}</span>. From {match.profile.firstName}&apos;s side:{" "}
+            <span className="tabular-nums">{match.candidateSide}</span>.
+          </p>
+          <FactorList factors={match.factors} />
+        </div>
+      </CollapsibleContent>
+    </Collapsible>
   );
 }

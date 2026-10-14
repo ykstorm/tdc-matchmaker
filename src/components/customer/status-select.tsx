@@ -23,7 +23,7 @@ export function StatusSelect({ customerId, initial }: { customerId: string; init
 
   return (
     <Select value={status} onValueChange={(value) => change(value as CustomerStatus)}>
-      <SelectTrigger aria-label="Journey status" className="min-w-36">
+      <SelectTrigger aria-label="Journey status">
         <SelectValue />
       </SelectTrigger>
       <SelectContent>

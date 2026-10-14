@@ -6,11 +6,11 @@ export function FactorList({ factors }: { factors: FactorScore[] }) {
   return (
     <ul className="grid gap-2" aria-label="Score breakdown">
       {factors.map((factor) => (
-        <li key={factor.key} className="grid grid-cols-[6.5rem_minmax(0,1fr)] items-center gap-3 text-xs">
-          <span className="text-muted-foreground">
+        <li key={factor.key} className="flex items-center gap-3 text-xs">
+          <span className="text-muted-foreground w-28 shrink-0">
             {factor.label} <span className="tabular-nums">({factor.weight}%)</span>
           </span>
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1">
             <div className="bg-muted h-1.5 rounded-full" aria-hidden="true">
               <div className="bg-primary/70 h-full rounded-full" style={{ width: `${Math.round(factor.score * 100)}%` }} />
             </div>

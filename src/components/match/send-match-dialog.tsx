@@ -40,7 +40,7 @@ function MatchSummary({ profile }: { profile: Profile }) {
 export function SendMatchDialog({ matchmaker, customer, match, onClose, onSent }: Props) {
   return (
     <Dialog open={match !== null} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-xl">
+      <DialogContent>
         {match && <SendForm key={match.profile.id} {...{ matchmaker, customer, match, onClose, onSent }} />}
       </DialogContent>
     </Dialog>
@@ -69,7 +69,7 @@ function SendForm({ matchmaker, customer, match, onClose, onSent }: Props & { ma
   return (
     <form onSubmit={send} className="grid gap-4">
       <DialogHeader>
-        <DialogTitle className="font-serif text-xl font-normal">Send {match.profile.firstName} to {customer.firstName}</DialogTitle>
+        <DialogTitle>Send {match.profile.firstName} to {customer.firstName}</DialogTitle>
         <DialogDescription>Edit the email if you like. It goes to {customer.email}.</DialogDescription>
       </DialogHeader>
       <MatchSummary profile={match.profile} />
@@ -93,7 +93,7 @@ function EmailFields({ subject, body }: { subject: string; body: string }) {
       </div>
       <div className="grid gap-2">
         <Label htmlFor="body">Email</Label>
-        <Textarea id="body" name="body" defaultValue={body} rows={9} className="field-sizing-fixed" required />
+        <Textarea id="body" name="body" defaultValue={body} required />
       </div>
     </>
   );

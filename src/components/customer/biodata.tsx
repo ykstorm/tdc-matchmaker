@@ -41,10 +41,10 @@ function sections(p: Profile, prefs: PartnerPreferences): [string, Field[]][] {
 export function Biodata({ profile, preferences }: { profile: Profile; preferences: PartnerPreferences }) {
   return (
     <div className="grid gap-8">
-      <p className="max-w-prose text-[0.9375rem] leading-relaxed">{profile.about}</p>
+      <p className="max-w-prose text-base leading-relaxed">{profile.about}</p>
       {sections(profile, preferences).map(([title, fields]) => (
         <section key={title} aria-labelledby={`section-${title}`}>
-          <h2 id={`section-${title}`} className="text-muted-foreground text-xs font-semibold tracking-[0.05em] uppercase">
+          <h2 id={`section-${title}`} className="text-muted-foreground text-xs font-semibold tracking-label uppercase">
             {title}
           </h2>
           <dl className="mt-3 grid gap-x-6 gap-y-3 sm:grid-cols-2">

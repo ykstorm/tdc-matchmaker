@@ -29,11 +29,11 @@ export function NotesPanel({ customerId, initial }: { customerId: string; initia
 
   return (
     <section aria-labelledby="notes-heading" className="grid gap-4">
-      <h2 id="notes-heading" className="text-muted-foreground text-xs font-semibold tracking-[0.05em] uppercase">
+      <h2 id="notes-heading" className="text-muted-foreground text-xs font-semibold tracking-label uppercase">
         Notes from calls and meetings
       </h2>
       <form onSubmit={addNote} className="grid gap-2">
-        <Label htmlFor="note" className="sr-only">New note</Label>
+        <Label htmlFor="note">New note</Label>
         <Textarea id="note" name="note" placeholder="Parents want someone in Pune for the first two years" aria-invalid={!!error} aria-describedby="note-error" />
         <div className="flex items-center justify-between gap-4">
           <p id="note-error" role="status" className="text-destructive text-sm">{error}</p>
