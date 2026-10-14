@@ -1,8 +1,6 @@
+# Contributing
 
-
-# TDC Matchmaker
-
-Internal tool for matchmakers. Next.js App Router. Route handlers are the API.
+How this codebase is written. Next.js App Router, route handlers are the API.
 
 ## Where things live
 
@@ -15,7 +13,7 @@ Internal tool for matchmakers. Next.js App Router. Route handlers are the API.
 - `src/components/ui/` shadcn primitives. Feature components compose them.
 - `scripts/` the seed generator and quality checks.
 
-## Before writing code (Karpathy, Ponytail)
+## Before writing code
 
 - Read the code the change touches and trace the real flow first.
 - State assumptions. If two readings exist, ask. Don't pick silently.
@@ -38,7 +36,7 @@ Internal tool for matchmakers. Next.js App Router. Route handlers are the API.
 - Fix bugs at the root, once, where every caller passes through.
 - Done means verified: `npm run check` passes and the behaviour was exercised.
 
-## Complexity (cyclomatic-complexity skill)
+## Complexity
 
 - CC = decision points + 1. Decision points: if, else if, case, loops, catch,
   ternary, `&&`, `||`, `??`.
@@ -52,7 +50,7 @@ Internal tool for matchmakers. Next.js App Router. Route handlers are the API.
 - `npm run complexity` prints the per-function table. Paste before and after
   numbers when you refactor.
 
-## Writing (Caveman lite, plain English rules)
+## Writing
 
 Applies to comments, UI strings, commits, README and REPORT.
 
@@ -64,7 +62,9 @@ Applies to comments, UI strings, commits, README and REPORT.
 - Comments say why. If a comment restates the code, delete it.
 - Commits: one subject, imperative first line, a short paragraph on why. No trailers.
 
-## Interface (Jakub Krehel's better-* skills)
+## Interface
+
+Based on Jakub Krehel's interface rules (github.com/jakubkrehel/skills).
 
 - Accessibility: native elements, never `div onClick`. Every input has a
   `<label>`. Icon-only buttons have an `aria-label`. Visible `:focus-visible`
@@ -86,4 +86,4 @@ Applies to comments, UI strings, commits, README and REPORT.
 
 ## Before every commit
 
-`npm run check` runs typecheck, lint (with complexity), tests, prose and knip.
+`npm run check` runs typecheck, lint (complexity and shadcn design-system rules), tests, prose and knip.
