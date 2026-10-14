@@ -11,7 +11,7 @@ import { buildProfile } from "./seed/build-profile";
 import { createRandom, type Random } from "./seed/random";
 
 const SEED = 20261014;
-const PER_GENDER = 130;
+const PER_GENDER = 150;
 const CUSTOMERS_PER_MATCHMAKER = 12;
 const OUT = "src/server/data";
 

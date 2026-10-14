@@ -83,7 +83,7 @@ export const COMMUNITIES: Community[] = [
     femaleNames: ["Anjali", "Aparna", "Gayathri", "Revathi", "Athira"],
   },
   {
-    religion: "Muslim", motherTongue: "Urdu", share: 9, vegetarianShare: 0.02,
+    religion: "Muslim", motherTongue: "Urdu", share: 10, vegetarianShare: 0.02,
     places: [{ city: "Lucknow", state: "Uttar Pradesh" }, { city: "Hyderabad", state: "Telangana" }, { city: "Mumbai", state: "Maharashtra" }, { city: "Delhi", state: "Delhi" }],
     surnames: ["Khan", "Shaikh", "Siddiqui", "Ansari", "Qureshi", "Hussain"],
     castes: ["Sunni", "Shia"],
@@ -91,7 +91,7 @@ export const COMMUNITIES: Community[] = [
     femaleNames: ["Ayesha", "Zara", "Sana", "Mehreen", "Alina", "Fatima"],
   },
   {
-    religion: "Sikh", motherTongue: "Punjabi", share: 5, vegetarianShare: 0.35,
+    religion: "Sikh", motherTongue: "Punjabi", share: 8, vegetarianShare: 0.35,
     places: [{ city: "Chandigarh", state: "Punjab" }, { city: "Amritsar", state: "Punjab" }, { city: "Ludhiana", state: "Punjab" }, { city: "Delhi", state: "Delhi" }],
     surnames: ["Gill", "Sandhu", "Bedi", "Ahluwalia", "Dhillon"],
     castes: ["Jat", "Khatri", "Arora"],
@@ -99,7 +99,7 @@ export const COMMUNITIES: Community[] = [
     femaleNames: ["Simran", "Harleen", "Navneet", "Jasleen", "Prabhjot"],
   },
   {
-    religion: "Christian", motherTongue: "Malayalam", share: 4, vegetarianShare: 0.03,
+    religion: "Christian", motherTongue: "Malayalam", share: 6, vegetarianShare: 0.03,
     places: [{ city: "Kochi", state: "Kerala" }, { city: "Kottayam", state: "Kerala" }, { city: "Bengaluru", state: "Karnataka" }, { city: "Mumbai", state: "Maharashtra" }],
     surnames: ["Thomas", "Mathew", "George", "Varghese", "Joseph"],
     castes: ["Syro-Malabar Catholic", "Latin Catholic", "Marthoma"],
@@ -107,7 +107,7 @@ export const COMMUNITIES: Community[] = [
     femaleNames: ["Ann", "Merin", "Neenu", "Teresa", "Sneha"],
   },
   {
-    religion: "Jain", motherTongue: "Gujarati", share: 4, vegetarianShare: 1,
+    religion: "Jain", motherTongue: "Gujarati", share: 6, vegetarianShare: 1,
     places: [{ city: "Mumbai", state: "Maharashtra" }, { city: "Ahmedabad", state: "Gujarat" }, { city: "Jaipur", state: "Rajasthan" }],
     surnames: ["Jain", "Shah", "Mehta", "Doshi", "Sanghvi"],
     castes: ["Shwetambar", "Digambar"],
