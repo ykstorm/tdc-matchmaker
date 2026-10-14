@@ -22,13 +22,12 @@
   --accent-foreground: oklch(0.3 0.06 45);
   --destructive: oklch(0.55 0.2 27);
   --border: oklch(0.9 0.015 70);
-  --input: oklch(0.88 0.018 70);
+  --input: oklch(0.62 0.02 60);
   --ring: oklch(0.47 0.16 22);
-  --marigold: oklch(0.78 0.15 70);
-  --status-new: oklch(0.55 0.13 245);
-  --status-matching: oklch(0.6 0.14 65);
-  --status-introduced: oklch(0.52 0.13 155);
-  --status-hold: oklch(0.55 0.02 60);
+  --status-new: oklch(0.48 0.13 245);
+  --status-matching: oklch(0.5 0.12 60);
+  --status-introduced: oklch(0.47 0.12 155);
+  --status-hold: oklch(0.48 0.02 60);
 }
 
 @theme inline {
@@ -52,7 +51,6 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --color-marigold: var(--marigold);
   --color-status-new: var(--status-new);
   --color-status-matching: var(--status-matching);
   --color-status-introduced: var(--status-introduced);

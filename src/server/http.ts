@@ -1,3 +1,4 @@
+import { unstable_rethrow } from "next/navigation";
 import { ZodError } from "zod";
 
 import { NotFoundError, UnauthorizedError } from "./errors";
@@ -15,6 +16,9 @@ export async function respond(work: () => Promise<unknown>) {
   try {
     return Response.json(await work());
   } catch (error) {
+    // Next signals things like "this route is dynamic" by throwing. Those
+    // must pass through, or Next can't do its job.
+    unstable_rethrow(error);
     const status = statusFor(error);
     if (status === 500) console.error(error);
     const message = status === 500 ? "Server error. Try again in a minute." : messageOf(error);

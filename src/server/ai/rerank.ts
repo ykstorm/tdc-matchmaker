@@ -5,7 +5,7 @@ import type { Profile } from "@/types/profile";
 import { tierFor } from "../matching/score";
 import { askForJson, profileBrief } from "./groq";
 
-export const RERANK_PROMPT = `You help a matchmaker at an Indian matchmaking service.
+const RERANK_PROMPT = `You help a matchmaker at an Indian matchmaking service.
 You get one customer and a shortlist of candidates. Each candidate already has a
 rule-based score from 0 to 100 and the factor breakdown behind it.
 

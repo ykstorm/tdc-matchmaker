@@ -4,14 +4,14 @@ import customerSeed from "./customers.json";
 import matchmakerSeed from "./matchmakers.json";
 import profileSeed from "./profiles.json";
 
-export interface Matchmaker {
+interface Matchmaker {
   id: string;
   username: string;
   name: string;
   passwordHash: string;
 }
 
-export interface SentEmail {
+interface SentEmail {
   to: string;
   subject: string;
   body: string;
