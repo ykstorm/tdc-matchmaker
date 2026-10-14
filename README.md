@@ -5,7 +5,7 @@ customers, open one to read their full biodata, and get ranked matches with
 a short note on why each one could work. Send a match with an editable
 email.
 
-- Live demo: _added after deploy_
+- Live demo: https://tdc-matchmaker-five.vercel.app
 - How the matching and AI work: [REPORT.md](REPORT.md)
 
 ## Sign in
