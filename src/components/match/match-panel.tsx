@@ -7,6 +7,7 @@ import { api } from "@/lib/api";
 import type { Match, MatchList } from "@/types/match";
 import type { Profile } from "@/types/profile";
 import { MatchCard } from "./match-card";
+import { NearMisses } from "./near-misses";
 import { SendMatchDialog } from "./send-match-dialog";
 
 interface Props {
@@ -48,13 +49,16 @@ export function MatchPanel({ matchmaker, customer, sentMatchIds }: Props) {
           <Button variant="outline" size="sm" onClick={retry}>Try again</Button>
         </div>
       )}
-      {load.state === "ready" && <PoolSummary list={load.list} />}
       {load.state === "ready" && (
-        <ul className="mt-4 grid gap-3">
-          {load.list.matches.map((match) => (
-            <MatchCard key={match.profile.id} match={match} sent={sent.includes(match.profile.id)} onSend={setSending} />
-          ))}
-        </ul>
+        <>
+          <PoolSummary list={load.list} />
+          <NearMisses nearMisses={load.list.nearMisses} />
+          <ul className="mt-4 grid gap-3">
+            {load.list.matches.map((match) => (
+              <MatchCard key={match.profile.id} match={match} sent={sent.includes(match.profile.id)} onSend={setSending} />
+            ))}
+          </ul>
+        </>
       )}
       <SendMatchDialog
         matchmaker={matchmaker}

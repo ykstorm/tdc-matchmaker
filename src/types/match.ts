@@ -35,9 +35,15 @@ export interface Match {
   explainedBy: "ai" | "rules";
 }
 
+export interface NearMiss {
+  rule: string;
+  count: number;
+}
+
 export interface MatchList {
   matches: Match[];
   poolSize: number;
   passedFilters: number;
   relaxed: string[];
+  nearMisses: NearMiss[];
 }

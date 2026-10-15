@@ -43,6 +43,25 @@ describe("rankMatches", () => {
   });
 });
 
+describe("near misses", () => {
+  it("counts people who fail exactly one of the customer's own rules", () => {
+    const pool = [
+      woman("ok"),
+      woman("other-faith-1", { religion: "Christian" }),
+      woman("other-faith-2", { religion: "Sikh" }),
+      woman("divorced", { maritalStatus: "Divorced" }),
+      woman("two-misses", { religion: "Jain", maritalStatus: "Divorced" }),
+      woman("unverified", { verified: false, religion: "Muslim" }),
+    ];
+    const prefs = { ...OPEN_PREFS, sameReligionOnly: true, openToDivorced: false };
+    const { nearMisses } = rankMatches(customer, prefs, pool, TODAY);
+    expect(nearMisses).toEqual([
+      { rule: "the same-religion rule", count: 2 },
+      { rule: "the never-married rule", count: 1 },
+    ]);
+  });
+});
+
 describe("mutualScore", () => {
   it("lets a one-sided match sink below a balanced one with the same average", () => {
     expect(mutualScore(0.95, 0.35)).toBeLessThan(mutualScore(0.65, 0.65));
