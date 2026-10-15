@@ -171,7 +171,7 @@ doesn't spend the free-tier quota again.
   53 issues. Fixing them meant theme tokens for letter spacing, plain
   wrappers for layout, and a real button size for inline links. The vendored
   primitives keep upstream shadcn's exact values, so that one rule skips them.
-- **Complexity:** 256 functions. Highest is 8 (`dietFit`). Five sit between 6
+- **Complexity:** 260 functions. Highest is 8 (`dietFit`). Five sit between 6
   and 8. None over 10. `npm run complexity` prints the table.
 - **Tests:** 17 unit tests on the factors and the ranker: dealbreakers,
   the age, height and income bands, the kids clash, age widening, and the

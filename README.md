@@ -5,17 +5,20 @@ customers, open one to read their full biodata, and get ranked matches with
 a short note on why each one could work. Send a match with an editable
 email.
 
-- Live demo: https://tdc-matchmaker-five.vercel.app
-- How the matching and AI work: [REPORT.md](REPORT.md)
+## For reviewers
 
-## Sign in
-
-| Username | Password |
+| Deliverable | Where |
 |---|---|
-| priya | priya123 |
-| arjun | arjun123 |
+| Live demo | https://tdc-matchmaker-five.vercel.app |
+| Login | `priya` / `priya123` or `arjun` / `arjun123` (also shown on the sign-in page) |
+| Matching logic write-up (AI, algorithm, assumptions) | [REPORT.md](REPORT.md) |
+| The algorithm | [`src/server/matching/`](src/server/matching) |
+| The AI re-ranking | [`src/server/ai/`](src/server/ai) |
+| 300 dummy profiles and the seeded generator | [`src/server/data/profiles.json`](src/server/data/profiles.json), [`scripts/generate-profiles.ts`](scripts/generate-profiles.ts) |
+| Tests | [`tests/`](tests) |
 
-Each matchmaker sees only their own 12 customers.
+A quick tour: sign in, open any customer, read the biodata on the left, then
+open "Why this match?" on a match and click Send match.
 
 ## Run it
 
