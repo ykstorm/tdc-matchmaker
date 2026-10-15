@@ -79,6 +79,22 @@ sending it.
 Final labels: 85 and above is "High Potential", 72 and above is "Good Fit",
 and the rest is "Worth a Look".
 
+## Who almost made it
+
+Under the matches, the app also lists the people who fit everything except
+one of the customer's own rules, grouped by rule. For example: "100 people
+fit everything except the same-religion rule."
+
+This is what a good matchmaker does in their head. When a customer's list is
+thin, the useful question isn't "who else is out there?" but "which of your
+rules is costing you the most?" In the test data, one Christian customer
+has only 4 matches, but 100 more people would open up if they were open to
+another faith. That turns a dead end into a conversation the matchmaker can
+have on the next call.
+
+Nobody is shown or contacted because of this. It's only a count, and the
+customer's rules still decide.
+
 ## Where AI comes in
 
 After the three steps, the top 20 matches go to an AI model in one go. It's
@@ -144,6 +160,7 @@ sign-in, Groq through the OpenAI SDK.
 | Weights by gender, and why | `src/server/matching/weights.ts` |
 | Two-sided score and labels | `src/server/matching/score.ts` |
 | Ranking and age widening | `src/server/matching/rank.ts` |
+| Who almost made it | `src/server/matching/near-misses.ts` |
 | AI review, 8-point cap, fallback | `src/server/ai/rerank.ts`, `src/server/ai/groq.ts` |
 | Profile generator | `scripts/generate-profiles.ts`, `scripts/seed/` |
 | Sign-in and page guard | `src/server/services/auth-service.ts`, `src/proxy.ts` |
@@ -165,7 +182,7 @@ checks the one-sided example above.
 - `@shadcn/lint` fails raw colors, one-off values like `p-[13px]`, and
   restyling a component from outside. The first run found 53 issues, all
   fixed.
-- 17 unit tests on the factors and the ranker.
+- 18 unit tests on the factors, the ranker and the near-miss counts.
 - knip finds no unused files, exports or dependencies.
 - A word check fails on em dashes and filler words.
 

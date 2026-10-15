@@ -18,7 +18,9 @@ email.
 | Tests | [`tests/`](tests) |
 
 A quick tour: sign in, open any customer, read the biodata on the left, then
-open "Why this match?" on a match and click Send match.
+open "Why this match?" on a match and click Send match. Under the match
+count, "Almost made it" shows which of the customer's rules is costing them
+the most options.
 
 ## Run it
 
