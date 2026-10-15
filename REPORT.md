@@ -4,6 +4,18 @@ This is the write-up for the matchmaker dashboard assignment. The first part
 is for anyone. The last part, "For engineers", has the file paths and the
 numbers.
 
+## Why it's built this way
+
+The Date Crew pitches itself to people "done with endless swiping", with
+matchmakers who "look beyond biodatas" and coach clients on communication,
+timing and family dynamics. So I didn't want this to be another app that
+lines up profiles by score. Two choices come from that. Every match is
+checked from both sides, because an introduction only works if the other
+person would say yes too. And when a customer's list is thin, the app shows
+which of their own rules is costing them the most, so the next call can be a
+conversation about that rule. The score helps the matchmaker think. The
+matchmaker still decides.
+
 ## What it does
 
 A matchmaker signs in and sees the customers they look after. Opening a
