@@ -1,197 +1,176 @@
-# TDC Matchmaker: how it works and why
+# TDC Matchmaker: how it works
 
-This is the write-up for the matchmaker dashboard assignment. It covers the
-matching algorithm, how AI is used, the assumptions I made, what I left out,
-and the numbers I checked before calling it done.
+This is the write-up for the matchmaker dashboard assignment. The first part
+is for anyone. The last part, "For engineers", has the file paths and the
+numbers.
 
-## 1. Request flow
+## What it does
 
-1. A matchmaker signs in at `/login`. `src/app/api/auth/login/route.ts` checks
-   the password against a bcrypt hash (`src/server/services/auth-service.ts`)
-   and sets a signed JWT in an httpOnly cookie (`src/server/token.ts`).
-2. `src/proxy.ts` runs before every page. No valid cookie means a redirect to
-   `/login`. API routes check the cookie themselves and answer 401.
-3. `/dashboard` (`src/app/dashboard/page.tsx`) lists only that matchmaker's
-   customers through `listCustomers` in `src/server/services/customer-service.ts`.
-4. `/customer/[id]` (`src/app/customer/[id]/page.tsx`) shows the biodata,
-   journey status and call notes. Asking for another matchmaker's customer
-   returns the same 404 as a customer that doesn't exist.
-5. The match panel calls `GET /api/customers/[id]/matches`. `match-service.ts`
-   runs the rule-based ranking (`src/server/matching/rank.ts`), then sends the
-   top 20 to Groq for review (`src/server/ai/rerank.ts`).
-6. Send match opens a dialog with an editable email
-   (`src/lib/intro-email.ts`). Confirming calls `POST /api/match/send`, which
-   logs a mock email, records the match as sent and moves the customer to
-   Introduced.
+A matchmaker signs in and sees the customers they look after. Opening a
+customer shows their full biodata, laid out the way an Indian biodata is
+usually laid out: personal details, education and career, family and
+background, lifestyle, and what they want in a partner. Next to it is a list
+of suggested matches, best first, each with a score and a short note on why
+it could work. The matchmaker can write notes from calls, change the
+customer's stage (New, Matching, Introduced, On Hold) and send a match with
+an email they can edit first.
 
-Route handlers stay thin. They parse input with zod (`src/server/schemas.ts`),
-call one service and return. Errors map to status codes in one place,
-`src/server/http.ts`.
+## Where the profiles come from
 
-## 2. The matching algorithm
+There are 300 made-up people: 150 women and 150 men. The brief asked for at
+least 100. I made more so that smaller communities, like a Jain or Christian
+customer who wants someone of the same faith, still get real choices.
 
-Matching runs in three passes.
+They aren't random. A script builds each person from a community, so the
+pieces fit: a Reddy lives in Hyderabad and speaks Telugu, a Jain is
+vegetarian, and pay goes up with age and depends on the job. The script uses
+a fixed starting number, so it makes the same 300 people every time.
 
-**Pass 1, dealbreakers.** A candidate is dropped if they are the same gender,
-unverified, or break one of the customer's stated partner preferences: same
-religion only, open to divorced or not, vegetarian only. These never bend,
-because a matchmaker who sends someone outside a stated dealbreaker loses
-the customer's trust. Age range is the one soft filter. If fewer than 15
-people fit, the range widens by 2 years each side, up to twice, and the panel
-says so. A Sikh or Christian customer with a same-religion filter would
-otherwise see an empty list.
+24 of the 300 are customers, 12 for each matchmaker. Everyone else is a
+possible match.
 
-**Pass 2, weighted score from both sides.** Each factor is a small pure
-function in `src/server/matching/factors/` that returns a 0 to 1 score and a
-short reason ("5 years younger", "Both say yes to kids"). The weights depend
-on who is looking (`src/server/matching/weights.ts`):
+## How a match is picked
 
-| Factor | Man looking | Woman looking | How it scores |
-|---|---|---|---|
-| Kids | 20 | 16 | Same answer full, one Maybe half, Yes vs No zero |
-| Age | 18 | 10 | Man: she is 1 to 4 years younger. Woman: he is 0 to 4 years older |
-| Income | 14 | | She earns 45 to 95 percent of what he earns |
-| Height | 14 | | She is 8 to 20 cm shorter |
-| Career | | 18 | He earns at least as much, no penalty for more, plus related field |
-| Family values | 8 | 14 | Values, family type and pets lined up |
-| Relocation | | 14 | Same city full, otherwise how willing each one is to move |
-| Education | | 10 | Same level or higher |
-| Diet | 10 | 8 | Same diet full, two vegetarian diets close, veg and non-veg far |
-| Location | 10 | 5 | Same city, same state, then willingness to move |
-| Lifestyle | 6 | 5 | Drinking and smoking match |
-| Horoscope | 8 | 8 | Manglik match, only when the customer says it matters |
+Think of it as three steps.
 
-The man's weights follow the brief: younger, earns less, shorter, same view
-on kids. Kids gets the top weight because it's the one difference that's hard
-to negotiate after marriage. The other three are preferences families bend on. The
-woman's weights put career, kids, family values and relocation first. In
-Indian families the woman usually moves after marriage, so relocation is a
-real question for her and a minor one for him. Factors that don't apply drop
-out and the remaining weights are rescaled, so nobody is marked down for a
-question that doesn't concern them.
+**Step 1: rule out the impossible.** Some things a customer has told us are
+dealbreakers. If they only want someone of the same religion, or won't
+consider someone divorced, or want a vegetarian partner, anyone who breaks
+that is never shown. We also only suggest verified profiles. The customer's
+age range is the one thing that can stretch. If it leaves fewer than 15
+people, the range widens by 2 years and the screen says so, instead of
+showing an empty list.
 
-**The part I'd call new: reciprocal scoring.** Most matching code scores a
-pair once, from the customer's side. That misses half the problem. A match
-only works if both people say yes. So every pair is scored twice. Once from
-the customer's side with their gender's weights and stated preferences, and
-once from the candidate's side with the candidate's gender's weights. The
-two are combined with a weighted geometric mean:
+**Step 2: score what's left.** Each person gets a score out of 100, built
+from things like age gap, income, height, whether they want kids, diet,
+family values, city, and whether they'd move. What counts most depends on
+who is looking, because men and women in Indian matchmaking weigh different
+things.
 
-```
-score = customerSide^0.6 × candidateSide^0.4
-```
+| What matters most | When a man is looking | When a woman is looking |
+|---|---|---|
+| First | Same answer on kids | Career and income |
+| Then | She's a little younger | Same answer on kids |
+| Then | She earns a bit less | Family values line up |
+| Then | She's a bit shorter | Willing to relocate |
+| Also counted | Diet, city, family values, habits | Education, age, diet, city, habits |
 
-The customer's view counts for more, since they are the one we work for.
-The geometric mean matters more than the weights. With a plain average, a
-95 from the customer could hide a 20 from the candidate. Multiplying makes a
-one-sided match sink. Example: 0.95 and 0.35 average to 0.65, but their
-geometric mean is about 0.64, below a balanced 0.65 and 0.65 pair (there's a
-test for exactly that in `tests/rank.test.ts`). The match card shows both
-numbers, "fit from your customer's side" and "from her side", so a
-matchmaker can see when a match is lopsided before sending it.
+The man's list follows the brief. Kids sits at the top because it's the one
+difference that's hard to settle after the wedding. For women, career and
+relocation weigh more, because in most Indian families she is the one who
+moves after marriage. Horoscope counts only when the customer says it
+matters to the family.
 
-Final score bands: 85 and up is High Potential, 72 and up is Good Fit, the
-rest is Worth a Look.
+**Step 3: check it works both ways.** This is the part I'd point to as new.
+Most matching only asks "is this person right for my customer?" But a match
+only happens if both people say yes. So every pair is scored twice: once
+from the customer's side and once from the other person's side, using that
+person's own priorities. The two scores are then combined in a way that
+punishes one-sided matches.
 
-## 3. How AI is used
+An example. Say person A looks great for the customer (95) but the customer
+is a poor fit for A (35). A simple average gives 65. Another person, B, is a
+decent fit both ways (65 and 65), also averaging 65. A matchmaker would pick
+B, because B is likely to say yes. The app does too: it multiplies the two
+scores instead of averaging them, so A ends up just below B. Every match
+card shows both sides, so the matchmaker can spot a lopsided match before
+sending it.
 
-The top 20 from pass 2 go to Groq in one call
-(`openai/gpt-oss-20b`, free tier, set by `GROQ_MODEL`). The model gets the
-customer, each candidate's rule score and the factor breakdown. It is asked
-to read the two people as people, looking for what the numbers miss: shared
-hobbies, how their "about" lines sound together, whether their families
-would get on, a soft clash the rules scored as fine. It returns strict JSON
-with an adjusted score and a two or three sentence note for the matchmaker:
-the strongest reason this could work and the one thing to check first.
+Final labels: 85 and above is "High Potential", 72 and above is "Good Fit",
+and the rest is "Worth a Look".
 
-Three guardrails keep it honest.
+## Where AI comes in
 
-- The model can move a score by 8 points at most
-  (`MAX_SHIFT` in `src/server/ai/rerank.ts`). It can reorder close calls. It
-  can't rescue a match the rules rejected or bury one they loved.
-- The reply is validated with zod. A malformed reply, a timeout, a missing
-  key or a rate limit all fall back to the rule-based ranking and a templated
-  explanation built from the same factor scores. The demo never breaks
-  because of the AI.
-- The model never sees a surname, email or phone number
-  (`profileBrief` in `src/server/ai/groq.ts`). It doesn't need them to judge
-  fit, so they never leave the server.
+After the three steps, the top 20 matches go to an AI model in one go. It's
+an open model (`openai/gpt-oss-20b`) running on Groq's free tier, so it
+costs nothing. No paid OpenAI account is involved.
 
-Why re-ranking instead of letting the model score from scratch: the rules
-are explainable, testable and consistent. An 8B or 20B model asked to score
-300 profiles cold is none of those. So the rules do the heavy lifting and the
-model does the one thing rules can't, which is read the profiles as text.
-Each AI review is cached per customer and shortlist, so reopening a profile
-doesn't spend the free-tier quota again.
+The AI reads both profiles the way a person would. It looks for things the
+scoring can't see: shared hobbies, whether their "about me" lines sound like
+they'd get on, whether the families would mix well. For each match it writes
+two or three sentences for the matchmaker: the best reason this could work,
+and the one thing to check before introducing them. It can also nudge the
+order a little.
 
-## 4. Assumptions
+The AI is kept on a short leash:
 
-- Customers are matched with the opposite gender only. The brief frames it
-  that way and I kept that for the MVP.
-- Partner preferences are stated by the customer and treated as dealbreakers.
-  Everything else is a preference and lives in the score.
-- The matchmaker has final say. The algorithm suggests. It never sends
-  anything on its own.
-- Only verified profiles are suggested. The brief says matchmakers work with
-  verified profiles.
-- Incomes are annual, in lakhs of rupees. Heights are stored in cm and shown
-  in feet and inches too, because that's how families talk about height.
-- The pool is 300 generated profiles (150 men, 150 women). Each matchmaker
-  owns 12 customers. `npm run seed` regenerates the same data every time from
-  a fixed seed (`scripts/generate-profiles.ts`). Names, cities, castes,
-  languages and diets are generated per community, so a Reddy lives in
-  Hyderabad and speaks Telugu rather than landing in Amritsar.
-- I added the fields Indian biodata usually carries beyond the brief's list:
-  diet, mother tongue, gotra, manglik, rashi, family type and values, parents'
-  occupations, drinking and smoking, hobbies and a short about line.
+- It can move a score by 8 points at most. It can swap close calls, but it
+  can't push forward someone the rules turned down.
+- It never sees surnames, emails or phone numbers. It doesn't need them.
+- If it's slow, gives a bad answer, or isn't available, the app quietly uses
+  the step 2 and 3 scores and writes the note from them instead. The demo
+  never breaks because of the AI.
 
-## 5. What I did not do
+The card says which kind of note you're reading.
 
-- **No database.** The store is in memory, seeded from JSON
-  (`src/server/data/store.ts`). Notes, status changes and sent matches reset
-  when the server restarts. On Vercel that can happen between visits. Moving
-  to Postgres changes that one file, not the services.
-- **No real email.** Send match logs the email to the server log and keeps it
-  in an in-memory outbox.
-- **No sign-up or password reset.** Two matchmaker accounts are seeded.
-- **No light or dark switch.** One warm light theme.
-- **No AI-written intro emails.** The email is a template the matchmaker
-  edits. I cut AI here to keep the AI work focused on ranking, which is the
-  assignment's mandatory part.
+## Assumptions I made
 
-## 6. Quality checks
+- Customers are matched with the opposite gender, as the brief describes.
+- What a customer states as a must-have is a dealbreaker. Everything else
+  is a preference that raises or lowers the score.
+- The matchmaker decides. The app only suggests and never sends anything on
+  its own.
+- Incomes are yearly, in lakhs of rupees. Heights are shown in feet and
+  inches as well as cm, because that's how families talk about height.
+- I added the fields an Indian biodata usually has that the brief didn't
+  list: diet, mother tongue, gotra, manglik, rashi, family type and values,
+  parents' work, drinking and smoking, hobbies, and a short "about me".
 
-`npm run check` runs all of these, and all pass.
+## What I left out
 
-- **Types:** `tsc --noEmit` clean.
-- **Lint:** ESLint fails any function over cyclomatic complexity 10, any
-  function over 40 lines and any file over 200 lines.
-- **Design system:** `@shadcn/lint` fails raw colors, arbitrary values like
-  `p-[13px]`, and restyling a component with `className`. Turning it on found
-  53 issues. Fixing them meant theme tokens for letter spacing, plain
-  wrappers for layout, and a real button size for inline links. The vendored
-  primitives keep upstream shadcn's exact values, so that one rule skips them.
-- **Complexity:** 260 functions. Highest is 8 (`dietFit`). Five sit between 6
-  and 8. None over 10. `npm run complexity` prints the table.
-- **Tests:** 17 unit tests on the factors and the ranker: dealbreakers,
-  the age, height and income bands, the kids clash, age widening, and the
-  reciprocal score sinking one-sided matches.
-- **Dead code:** knip reports no unused files, exports or dependencies.
-- **Writing:** `npm run prose` fails on em dashes and a list of filler words.
+- **No database.** Everything lives in the app's memory. Notes, stage
+  changes and sent matches reset when the server restarts, which on Vercel
+  can happen between visits. Adding a real database would change one file.
+- **No real email.** Send match writes the email to the server log instead
+  of sending it.
+- **No sign-up or password reset.** There are two ready-made matchmaker
+  accounts: `priya` / `priya123` and `arjun` / `arjun123`.
+- **No AI-written emails.** The intro email is a template the matchmaker
+  edits. I kept the AI focused on ranking, which is the part the brief
+  requires.
 
-Interface review, against Jakub Krehel's better-* rules:
+## For engineers
 
-| Check | Result |
+**Stack.** Next.js 16 (pages plus route handlers as the API), TypeScript,
+Tailwind 4, shadcn/ui on Radix, zod for input checks, jose and bcryptjs for
+sign-in, Groq through the OpenAI SDK.
+
+**Where things are.**
+
+| Part | File |
 |---|---|
-| Contrast, text on background | 15.8:1 body, 5.8:1 muted text |
-| Status badge text on its tint | 5.4 to 5.8:1, after darkening them from 3.6 to 4.7:1 |
-| Input borders (WCAG 1.4.11, 3:1) | 3.7:1, after raising them from 1.4:1 |
-| Status by color alone | No. Every status and tier shows its label |
-| Keyboard path | Customer names are real links. Dialog traps and returns focus |
-| Labels | Every input has a label. Errors sit in live regions rendered from the start |
-| Motion | Button press scales to 0.96, only when enabled and when reduced motion is off |
-| Numbers | Scores, ages and counts use tabular figures |
+| Dealbreakers | `src/server/matching/filters.ts` |
+| One function per scoring factor | `src/server/matching/factors/` |
+| Weights by gender, and why | `src/server/matching/weights.ts` |
+| Two-sided score and labels | `src/server/matching/score.ts` |
+| Ranking and age widening | `src/server/matching/rank.ts` |
+| AI review, 8-point cap, fallback | `src/server/ai/rerank.ts`, `src/server/ai/groq.ts` |
+| Profile generator | `scripts/generate-profiles.ts`, `scripts/seed/` |
+| Sign-in and page guard | `src/server/services/auth-service.ts`, `src/proxy.ts` |
+| Tests | `tests/` |
 
-Not verified: I couldn't run a browser in the build sandbox, so I haven't
-checked layout at 320px width or 200% zoom by eye. That check gets done on
-the live URL.
+**Request flow.** Sign-in checks a bcrypt hash and sets a signed JWT in an
+httpOnly cookie. `src/proxy.ts` sends anyone without one back to `/login`.
+API routes check the cookie themselves and parse input with zod. A
+matchmaker asking for another matchmaker's customer gets the same 404 as
+for one that doesn't exist. The two-sided score is
+`customerSide^0.6 × candidateSide^0.4`. A test in `tests/rank.test.ts`
+checks the one-sided example above.
+
+**Checks.** `npm run check` runs all of these, and all pass:
+
+- TypeScript with no errors.
+- ESLint fails any function over cyclomatic complexity 10, over 40 lines,
+  or any file over 200 lines. Highest complexity today is 8.
+- `@shadcn/lint` fails raw colors, one-off values like `p-[13px]`, and
+  restyling a component from outside. The first run found 53 issues, all
+  fixed.
+- 17 unit tests on the factors and the ranker.
+- knip finds no unused files, exports or dependencies.
+- A word check fails on em dashes and filler words.
+
+**Accessibility.** Text contrast is 15.8:1, and muted text is 5.8:1. Status
+badges and input borders were darkened until they passed WCAG, and every
+status shows a word, not only a color. Every field has a label. The send
+dialog traps and returns keyboard focus. Button motion turns off when the
+system asks for reduced motion.
