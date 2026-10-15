@@ -44,7 +44,9 @@ export default async function CustomerPage({ params }: PageProps<"/customer/[id]
           <Biodata profile={profile} preferences={customer.preferences} />
           <NotesPanel customerId={profile.id} initial={customer.notes} />
         </div>
-        <div className="min-w-0 lg:col-span-2">
+        {/* On wide screens the matches scroll on their own, so you can move
+            through all 20 while the biodata stays where it is. */}
+        <div className="min-w-0 lg:sticky lg:top-0 lg:col-span-2 lg:max-h-screen lg:self-start lg:overflow-y-auto lg:overscroll-contain lg:py-2 lg:pr-2">
           <MatchPanel matchmaker={session.name} customer={profile} sentMatchIds={customer.sentMatchIds} />
         </div>
       </main>
